@@ -261,6 +261,13 @@ POST /resume/upload
 Upload resume files.
 
 
+### Job Description Upload
+
+POST /job/upload
+
+Upload job descriptions.
+
+
 ### Job Analysis
 
 POST /job/analyze
