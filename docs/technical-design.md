@@ -184,6 +184,7 @@ Fields:
 - event_type
 - event_time
 - notes
+- reminder
 
 
 ### MatchResult
