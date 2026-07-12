@@ -170,7 +170,8 @@ Fields:
 - position
 - status
 - result
-
+- created_at
+- updated_at
 
 ### InterviewEvent
 
