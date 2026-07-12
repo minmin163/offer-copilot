@@ -3,7 +3,15 @@
 import { useState } from "react";
 
 
-export default function UploadBox() {
+interface UploadBoxProps {
+  title: string;
+}
+
+
+export default function UploadBox({
+  title
+}: UploadBoxProps) {
+
 
   const [fileName, setFileName] = useState("");
 
@@ -24,11 +32,17 @@ export default function UploadBox() {
   return (
     <div>
 
+      <h3>
+        {title}
+      </h3>
+
+
       <input
         type="file"
         accept=".pdf,.jpg,.png"
         onChange={handleUpload}
       />
+
 
       {
         fileName &&
@@ -36,6 +50,7 @@ export default function UploadBox() {
           Selected: {fileName}
         </p>
       }
+
 
     </div>
   );
