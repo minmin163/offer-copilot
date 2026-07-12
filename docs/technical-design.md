@@ -112,3 +112,216 @@ Potential future features:
 - Interview voice simulation
 - Salary negotiation assistant
 - Multi-language support
+
+
+---
+
+## 6. Data Model Design
+
+The system uses the following core data models.
+
+
+### User
+
+Stores user profile information.
+
+Fields:
+
+- id
+- name
+- email
+
+
+### Resume
+
+Stores uploaded resume information.
+
+Fields:
+
+- id
+- user_id
+- file_name
+- file_type
+- file_url
+- content
+
+
+### Job
+
+Stores target job information.
+
+Fields:
+
+- id
+- title
+- company
+- description
+
+
+### Application
+
+Stores user's job application progress.
+
+Fields:
+
+- id
+- user_id
+- company
+- position
+- status
+- result
+
+
+### InterviewEvent
+
+Stores interview schedule information.
+
+Fields:
+
+- id
+- application_id
+- event_type
+- event_time
+- notes
+
+
+### MatchResult
+
+Stores AI matching analysis results.
+
+Fields:
+
+- score
+- strengths
+- weaknesses
+- suggestions
+
+
+### InterviewQuestion
+
+Stores AI generated interview preparation content.
+
+Fields:
+
+- question
+- answer
+
+
+---
+
+## 7. File Processing Design
+
+The system supports resume uploads in multiple formats.
+
+Supported formats:
+
+- PDF
+- JPG
+- PNG
+
+
+Processing Flow:
+
+
+Resume File
+
+↓
+
+File Storage
+
+↓
+
+PDF Parser / OCR
+
+↓
+
+Text Extraction
+
+↓
+
+AI Analysis
+
+
+The extracted resume content will be stored and used for AI matching.
+
+
+---
+
+## 8. API Design
+
+Main backend APIs:
+
+
+### Resume Upload
+
+POST /resume/upload
+
+Upload resume files.
+
+
+### Job Analysis
+
+POST /job/analyze
+
+Analyze job descriptions.
+
+
+### Resume Matching
+
+POST /match/analyze
+
+Compare resume with job requirements.
+
+
+### Interview Preparation
+
+POST /interview/generate
+
+Generate interview questions.
+
+
+### Application Management
+
+GET /applications
+
+Track job search progress.
+
+
+### Interview Calendar
+
+GET /calendar/events
+
+Manage interview schedules.
+
+
+---
+
+## 9. AI Agent Workflow
+
+The AI career assistant workflow:
+
+
+User Input
+
+↓
+
+Resume Understanding
+
+↓
+
+Job Requirement Analysis
+
+↓
+
+Resume-JD Matching
+
+↓
+
+Interview Preparation
+
+↓
+
+Career Recommendation
+
+
+Future versions will enable proactive career suggestions and personalized job search strategies.
