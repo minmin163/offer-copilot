@@ -25,3 +25,8 @@ class MatchResult(BaseModel):
     strengths: list[str]
     weaknesses: list[str]
     suggestions: list[str]
+
+
+class InterviewQuestion(BaseModel):
+    question: str
+    answer: str
