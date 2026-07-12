@@ -18,3 +18,10 @@ class Job(BaseModel):
     title: str
     company: str
     description: str
+
+
+class MatchResult(BaseModel):
+    score: int
+    strengths: list[str]
+    weaknesses: list[str]
+    suggestions: list[str]
