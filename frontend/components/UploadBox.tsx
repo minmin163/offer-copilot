@@ -44,6 +44,11 @@ export default function UploadBox({
       />
 
 
+      <p>
+        Supported formats: PDF / JPG / PNG
+      </p>
+
+
       {
         fileName &&
         <p>
