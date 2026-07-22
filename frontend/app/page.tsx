@@ -16,18 +16,10 @@ export default function Home() {
       </p>
 
 
-      <h2>
-        Upload Resume
-      </h2>
-
       <UploadBox
         title="Upload Resume"
       />
 
-
-      <h2>
-        Upload Job Description
-      </h2>
 
       <UploadBox
         title="Upload Job Description"
