@@ -1,0 +1,248 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#f8f5ef">
+<title>为什么我总想辞职？｜白梨小测 V2</title>
+<style>
+:root{--bg:#f8f5ef;--card:#fff;--ink:#292722;--muted:#706b63;--line:#e8e2d8;--accent:#30302c;--soft:#f1ece3}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif}
+main{max-width:650px;margin:auto;padding:25px 17px 70px}
+.brand{font-size:12px;letter-spacing:.1em;color:var(--muted);margin-bottom:18px}
+h1{font-size:34px;line-height:1.3;margin:5px 0 17px}
+h2{font-size:23px;line-height:1.45}
+p{line-height:1.75}
+.muted{color:var(--muted)}
+.card{padding:25px 21px;background:var(--card);border:1px solid var(--line);border-radius:19px;box-shadow:0 12px 40px #3e36280a}
+.pills{display:flex;gap:8px;margin:18px 0}
+.pill{font-size:12px;padding:7px 11px;border-radius:100px;background:var(--soft)}
+button{font:inherit;cursor:pointer}
+.btn{border:0;border-radius:13px;padding:14px 18px;font-size:15px}
+.primary{background:var(--accent);color:white}
+.secondary{background:var(--soft);color:var(--ink)}
+.full{width:100%}
+button:disabled{opacity:.35;cursor:default}
+.hidden{display:none!important}
+.track{height:7px;background:var(--soft);border-radius:99px;overflow:hidden;margin-bottom:21px}
+.track>div{background:var(--accent);height:100%;width:0;transition:width .2s}
+.meta{font-size:12px;color:var(--muted);margin-bottom:9px}
+.question{font-size:22px;line-height:1.48;font-weight:650;margin-bottom:19px;white-space:pre-line}
+.answer{display:block;text-align:left;width:100%;padding:15px 16px;margin:9px 0;background:#fff;border:1px solid var(--line);border-radius:13px;line-height:1.6}
+.answer.selected{background:var(--soft);border-color:var(--accent)}
+.footerbuttons{display:flex;gap:10px;margin-top:23px}
+.footerbuttons button{flex:1}
+.divider{height:1px;background:var(--line);margin:20px 0}
+.kicker{font-size:12px;color:var(--muted)}
+.resulthead{font-size:26px;margin:10px 0 17px;line-height:1.44}
+.section{margin:23px 0}
+.section h3{font-size:17px;margin:0 0 9px}
+.quote{background:var(--soft);padding:14px 15px;border-radius:12px;line-height:1.75;margin:10px 0}
+.quote span{display:block;margin:4px 0}
+.small{font-size:13px;color:var(--muted);line-height:1.7}
+.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:25px}
+.actions .btn{flex:1;min-width:120px}
+.error{color:#a33e2d;font-size:13px;margin:8px 0}
+@media(max-width:440px){h1{font-size:30px}.question{font-size:20px}.card{padding:23px 17px}}
+</style>
+</head>
+<body><main>
+<div class="brand">白梨观察室 / 白梨小测 · V2</div>
+<section id="intro">
+<h1>为什么我总想辞职？</h1>
+<p class="muted">从你最近一次认真想离职的时刻开始，找到最值得解决的那个问题。</p>
+<div class="pills"><span class="pill">12～14题</span><span class="pill">动态分支</span><span class="pill">不做无意义打分</span></div>
+<div class="card">
+<p>这份测试不会替你决定“该不该辞职”，而是帮你整理：发生了什么、什么最让你难受、有没有类似经历，以及下一步可以怎么验证。</p>
+<button id="start" class="btn primary full">开始测试</button>
+<p class="small">公开试用版。尚未接入小红书支付或兑换码验证，请勿用于收费交付。</p>
+</div></section>
+<section id="quiz" class="hidden card">
+<div class="track"><div id="progress"></div></div><div id="meta" class="meta"></div>
+<div id="question" class="question"></div><div id="choices"></div>
+<div class="footerbuttons"><button id="back" class="btn secondary">上一题</button><button id="next" class="btn primary" disabled>下一题</button></div>
+</section>
+<section id="result" class="hidden card" aria-live="polite"></section>
+</main><script>
+(function(){
+"use strict";
+const C=[
+{id:"c1",t:"回想最近一次你认真想过“我不想继续做这份工作”的时刻，大概在什么时候？",o:["最近一个月","1～3个月前","更早以前","我还没有认真想过辞职，只是偶尔抱怨"]},
+{id:"c2",t:"那次离职念头更接近哪一种出现方式？",o:["发生一件具体事情后，突然强烈起来","之前已经持续不满，那件事只是最后一根稻草","没有明显的事件，是一点点累积起来的","我不确定"]},
+{id:"c3",t:"假如当时那件事没有发生，或那段时间没有那么难熬，你觉得自己还会想离职吗？",o:["大概率不会那么想离开","还是会想离开，只是可能晚一点","我说不清"]},
+{id:"c4",t:"回到那个时刻，你最接近下面哪种状态？\n请选择这一次最想解决的矛盾，而不是平时所有的不满。",o:["我想做好工作，却不知道怎么做好","我能完成工作，但不想再这样做下去","我已经太累了，没力气继续","几个状态都有，暂时分不清"]}
+];
+const PICK={id:"m1",t:"确实可能几种感受同时存在。如果这次只能先解决一件事，哪件事会让你最松一口气？",o:["终于知道怎么推进难题","不必继续做让我不愿意做的事情或接受的条件","先从持续疲惫中恢复一点精力"]};
+const BRANCH={
+A:[
+{id:"a1",t:"回想那次任务，你最主要卡在什么地方？",o:["我不清楚最后到底需要交付什么","我知道目标，但不知道从哪里开始","我知道方法，但缺少资源或支持","我大致知道怎么做，却一直担心自己做错"]},
+{id:"a2",t:"当时面对这个困难，你实际上怎么做的？",o:["确认要求或寻求帮助，然后继续推进","自己反复研究和尝试","尝试解决，但始终没有突破","很难开始，一直拖着或回避"]},
+{id:"a3",t:"如果那个具体困难得到了有效解决，你觉得当时的离职念头会怎样？",o:["基本就不想走了","会缓解不少，但还有其他不满","还是强烈想离开","我无法判断"]},
+{id:"a4",t:"你以前有过“困难解决后，又愿意继续做”的真实经历吗？",o:["有过不止一次","有过一次","困难解决后，我通常还是想走","没有类似经历可参考"]}
+],
+B:[
+{id:"b1",t:"如果暂时抛开工资、考核和领导评价，你对目前每天做的事是什么感觉？",o:["其中不少事情我其实愿意做","能完成，但很难产生兴趣","即使没有压力，我也不想做这些事","我还没有认真想过"]},
+{id:"b2",t:"假如工作内容和收入不变，但任务更清晰、减少临时变化、正常下班，你愿意继续吗？",o:["愿意，这样我可能就不想走了","会好一些，但仍然想走","不会，这些变化不够","我不确定"]},
+{id:"b3",t:"假如工作内容和管理方式都不变，但收入和成长回报明显改善，你愿意继续吗？",o:["愿意，回报足够就可以继续","会好一些，但不想长期做","不会，我还是不想继续","我不确定"]},
+{id:"b4",t:"如果只能优先改变一件事，哪件最可能让你再试三个月？",o:["改变工作安排、节奏和管理方式","改善收入或职业成长机会","让我看到这份工作的价值和成果","换掉现在这类工作内容","这些变化都不足以让我留下／我还不确定"]}
+],
+C:[
+{id:"s1",t:"这种明显疲惫、提不起劲的状态已经持续多久了？",o:["最近一两周","已经一两个月","几个月或更久","反复出现，通常在某些阶段特别强烈"]},
+{id:"s2",t:"上一次真正连续休息、且不处理工作以后，你的状态怎么样？",o:["明显恢复了","好了一些，但回去工作后很快又累","休息后仍然很累","我最近没有真正休息过"]},
+{id:"s3",t:"在工作量相对轻的一天，你一般会怎样？",o:["明显轻松很多","身体没那么累，但脑子还是放不下工作","即使没多少事，也提不起劲","最近没有工作量较轻的日子"]},
+{id:"s4",t:"如果你恢复了精力，但工作条件不变，你还愿意继续这份工作吗？",o:["愿意，我主要需要恢复状态","可以继续一阵，但不能长期这样","不愿意，我知道工作本身还有问题","不确定"]}
+]};
+const F=[
+{id:"f1",t:"那次最想辞职以后，你做过什么？",o:["尝试处理问题或沟通调整","开始认真找新工作或打听机会","先搁置、忍着，没采取行动","休息、请假或减少投入，想恢复状态"]},
+{id:"f2",t:"在过去其他工作里，有过相似的“事件 → 感受 → 想离开”的过程吗？",o:["没有，这次比较特殊","有过类似感受，但原因不同","有过不止一次，而且过程相似","没有足够的工作经历可比较"]},
+{id:"f3",t:"你实际尝试过改善这次困扰吗？结果怎样？",o:["尝试过，情况有明显改善","尝试过，但问题基本没改善","没尝试，因为我暂时无法改变条件","还没尝试，但可能有调整空间"]},
+{id:"f4",t:"就这次的主要问题而言，谁最有可能推动改善？",o:["主要是我自己，例如调整方法或寻求支持","主要需要公司、领导或团队改变条件","双方都要调整","目前还不清楚"]}
+];
+const CL={id:"clar",t:"前面的回答透露出不止一种可能。为了避免误判，哪种说法更贴近这次经历？",o:["当时的问题一解决，我就有希望留下","即使直接的问题解决，我仍有长期的不满","我现在没有足够把握下结论"]};
+const mapQ={};[...C,PICK,...BRANCH.A,...BRANCH.B,...BRANCH.C,...F,CL].forEach(q=>mapQ[q.id]=q);
+let answers={};let step=0;
+const cacheKey="baili-quit-test-v2-answers";
+try {const x=JSON.parse(localStorage.getItem(cacheKey)||"{}");if(x&&typeof x==="object"&&!Array.isArray(x))answers=x} catch(e){}
+const el=id=>document.getElementById(id);
+function route(){
+ if(answers.c4===0)return "A";if(answers.c4===1)return "B";if(answers.c4===2)return "C";
+ if(answers.c4===3&&Number.isInteger(answers.m1))return ["A","B","C"][answers.m1];
+ return null;
+}
+function mustClarify(){
+ const r=route();if(!r||F.some(q=>!Number.isInteger(answers[q.id])))return false;
+ if(r==="A")return answers.a3>=2||(answers.a3===0&&answers.a4===2);
+ if(r==="B")return (answers.b2===0&&answers.b4===3)||(answers.b3===0&&answers.b4===3)||answers.b4===4;
+ return (answers.s2===0&&answers.s4===2)||answers.s4===3;
+}
+function plan(){
+ const p=C.slice();
+ if(answers.c4===3)p.push(PICK);
+ const r=route();
+ if(r){p.push(...BRANCH[r]);p.push(...F);if(mustClarify())p.push(CL)}
+ return p;
+}
+function done(){const p=plan();return route()!==null&&p.every(q=>Number.isInteger(answers[q.id]))}
+function persist(){try{localStorage.setItem(cacheKey,JSON.stringify(answers))}catch(e){}}
+function start(){
+ el("intro").classList.add("hidden");el("quiz").classList.remove("hidden");
+ const p=plan();const first=p.findIndex(q=>!Number.isInteger(answers[q.id]));
+ step=first<0?p.length-1:first;
+ if(done())showResult();else render();
+}
+function render(){
+ const p=plan();if(step>=p.length)step=p.length-1;
+ const q=p[step];if(!q)return;
+ el("meta").textContent="第 "+(step+1)+" / "+p.length+" 题 · "+(step<4?"回忆那次经历":step<9?"进一步了解你的处境":"核对与验证");
+ el("question").textContent=q.t;
+ el("progress").style.width=((step+1)/p.length*100).toFixed(0)+"%";
+ const box=el("choices");box.innerHTML="";
+ q.o.forEach((choice,i)=>{
+  const b=document.createElement("button");b.type="button";b.className="answer"+(answers[q.id]===i?" selected":"");
+  b.textContent=choice;b.addEventListener("click",()=>{answers[q.id]=i;persist();render()});box.appendChild(b);
+ });
+ el("back").disabled=step===0;
+ el("next").disabled=!Number.isInteger(answers[q.id]);
+ el("next").textContent=(step===p.length-1)?"查看分析":"下一题";
+}
+function next(){
+ if(el("next").disabled)return;
+ const p=plan();if(step>=p.length-1){if(done())showResult();else render()}else{step++;render()}
+ window.scrollTo(0,0);
+}
+function back(){if(step>0){step--;render();window.scrollTo(0,0)}}
+function text(qid){const q=mapQ[qid],n=answers[qid];return q&&Number.isInteger(n)?q.o[n]:"暂未回答"}
+function assessment(){
+ const r=route();let title,explain,uncertainty,action,evidence=[];
+ const repeat=answers.f2===2?"你提到类似的反应过程在不同工作里出现过不止一次。":answers.f2===0?"你提到这次经历在以往工作里并不常见。":answers.f2===1?"你过去也想过离职，但每次原因不完全一样。":"目前不能根据已有经历判断它是否会反复出现。";
+ const actionState=answers.f3===0?"你实际尝试调整后已有改善，这是比假设题更有价值的线索。":answers.f3===1?"你曾尝试调整，但困难没有明显改善，需要正视可能的外部限制。":"目前缺少实际改善前后的对照，下一步建议先做小规模验证。";
+ if(r==="A"){
+  const factors=["任务标准不明确","缺少可用的方法","资源或支持不足","对失败与评价的担心"];
+  const change=["每次接任务先确认交付物、成功标准和截止时间。","挑一个曾经卡住的任务，写出目标、已知信息、未知点，主动求助或找一个参考案例。","明确列出缺失的资源或协作支持，并向相关方提出可验证的请求。","把“我会不会被否定”和“任务本身有没有可行解”分开记录，先做一轮小交付拿反馈。"];
+  evidence=[text("a1"),text("a3"),text("a4")];
+  if(answers.a3<=1){
+   title="你这次想走，很可能先从“工作推进受阻”开始";
+   explain="你描述的直接阻碍是："+factors[answers.a1]+"。你认为当这一问题缓解时，离职念头也会下降。这说明它值得优先处理，但不能据此断定是唯一原因。";
+  }else{
+   title="任务困难是真实的，但未必是你想走的全部原因";
+   explain="你提到的阻碍是："+factors[answers.a1]+"。不过你也表示，即便解决它，可能仍然想走。因此不能把这次离职冲动简单归因为能力或方法。";
+  }
+  uncertainty="“不知道怎么做”不等于“能力差”。还需要结合任务要求是否合理、有没有支持，以及困难解决后的真实感受判断。";
+  action=change[answers.a1]+" 连续观察一周：当具体障碍被消除时，你是否更愿意继续这份工作？";
+ }else if(r==="B"){
+  evidence=[text("b1"),text("b2"),text("b3"),text("b4")];
+  const preference=answers.b4;
+  const names=["工作安排与管理方式","收入与成长回报","工作价值感","工作内容本身","尚未明确的复合困扰"];
+  title=preference===4?"你还不需要给“想辞职”强行找一个唯一理由":"你这次最想改变的，可能是"+names[preference];
+  explain="当你比较改变工作条件、改变回报，以及是否还愿意做这些工作内容时，你最优先选择的是："+names[preference]+"。这是你此刻更想改善的方向，不等于已经证明它是唯一原因。";
+  if((answers.b2===0&&preference===3)||(answers.b3===0&&preference===3)){
+   title="工作内容与现实条件可能都在影响你";
+   explain="你表示某种现实条件改善后更愿意留下，但又优先想换工作内容。这是两条并存的线索，暂时不应只给你贴上“工作错配”的标签。";
+  }
+  uncertainty="喜欢一份工作的内容，与接受它的考核、节奏、回报是不同的事。只改变一个条件的假设回答需要通过真实经历继续核对。";
+  const tips=[
+  "下一次遇到让你不愿继续的安排时，记下具体事项及可以协商的边界，尝试一次明确沟通。",
+  "整理实际工作投入、回报与未来机会，对照可核实的市场岗位，而不是仅凭一时情绪判断。",
+  "找出最近两周让你觉得“白做了”的任务，写明它是否产生可见成果；尝试争取一个完整的小项目。",
+  "列出每天占时间最多的三项工作，并与曾让你主动投入的事情比较，判断是核心内容不匹配还是某部分任务不喜欢。",
+  "先不要急着下结论；连续一周记录让你不想继续的具体时刻，再看重复出现的是什么。"
+  ];
+  action=tips[preference];
+ }else{
+  evidence=[text("s1"),text("s2"),text("s3"),text("s4")];
+  if(answers.s4===2){
+   title="休息可能不够，你还在对工作本身表达不满";
+   explain="你表示即使恢复精力，也未必愿意回到同样的工作条件。因此“先休息”也许只能解决一部分困扰，还需要认真审视目前的工作方式。";
+  }else if(answers.s2===0||answers.s3===0){
+   title="你现在最需要处理的，可能是持续消耗和恢复不足";
+   explain="你提到休息或工作量下降时状态会改善，这表明负荷和恢复机会值得优先关注，但不能仅据此确认全部原因。";
+  }else{
+   title="你的疲惫值得先被看见，原因暂时不宜下定论";
+   explain="你提到的疲惫没有随着工作量轻一些而明显消失，或者近期缺少真正休息。这些信息不足以区分长期过载、工作条件不匹配和其他因素。";
+  }
+  uncertainty="这份自测不能判断医学意义上的职业倦怠或其他健康问题。如果疲惫持续、休息无改善，或影响日常生活，可以考虑向专业人员求助。";
+  action="先争取一段真正不处理工作的休息时间；连续记录一周睡眠、恢复感和工作负荷。如果状态有所恢复，再重新判断你是否仍然想离开相同的工作条件。";
+ }
+ if(answers.clar===1){
+  uncertainty+=" 你进一步表示，直接困难解决后仍有长期不满，因此当前结果只能解释部分矛盾。";
+ }else if(answers.clar===2){
+  title="关于这次想辞职的原因，目前还不能得出单一结论";
+ }
+ if(answers.c1===3){
+  title="你目前更像是在探索工作不满，而不是已经形成明确的离职决定";
+ }
+ return {title,explain,uncertainty,action,evidence,repeat,actionState};
+}
+function showResult(){
+ if(!done())return;
+ el("quiz").classList.add("hidden");el("intro").classList.add("hidden");
+ const res=el("result");res.classList.remove("hidden");res.innerHTML="";
+ const data=assessment();
+ const h=document.createElement("div");h.innerHTML='<div class="kicker">白梨小测 V2 · 个人分析</div><h2 class="resulthead"></h2>';
+ h.querySelector("h2").textContent=data.title;res.appendChild(h);
+ function section(heading,paras,quotes){
+  const s=document.createElement("div");s.className="section";const title=document.createElement("h3");title.textContent=heading;s.appendChild(title);
+  if(quotes){const b=document.createElement("div");b.className="quote";quotes.forEach(t=>{const row=document.createElement("span");row.textContent="· "+t;b.appendChild(row)});s.appendChild(b)}
+  paras.forEach(t=>{const p=document.createElement("p");p.textContent=t;s.appendChild(p)});res.appendChild(s);
+ }
+ section("01 这次你告诉我们的线索",[],data.evidence);
+ section("02 我们目前能够判断什么",[data.explain]);
+ section("03 还有什么不能确定",[data.uncertainty,data.repeat,data.actionState]);
+ section("04 未来一周，先验证一件事",[data.action]);
+ section("05 最后想说",[ "想离开不代表你必须立刻辞职。先把一团模糊的“我不想干了”，拆成一个个真实存在、能够验证的问题。你可以先试着改变能改变的部分，也有权认真考虑那些长期无法改善的条件。"]);
+ const b=document.createElement("div");b.className="actions";
+ const restart=document.createElement("button");restart.className="btn secondary";restart.textContent="重新测试";restart.onclick=()=>{if(confirm("确定清空本机的答案，重新开始吗？")){answers={};persist();step=0;res.classList.add("hidden");el("intro").classList.remove("hidden");el("start").textContent="开始测试";window.scrollTo(0,0)}};
+ const copy=document.createElement("button");copy.className="btn primary";copy.textContent="复制分析摘要";
+ copy.onclick=async()=>{const body=data.title+"\n"+data.explain+"\n下一步："+data.action;try{await navigator.clipboard.writeText(body);copy.textContent="已复制"}catch(e){copy.textContent="复制不可用，请截图保存"}};
+ const share=document.createElement("button");share.className="btn secondary";share.textContent="分享测试入口";
+ share.onclick=async()=>{const u=location.href.split("#")[0];try{if(navigator.share)await navigator.share({title:"白梨小测｜为什么我总想辞职？",text:"从一次真实想离职的时刻开始，整理你最想解决的问题。",url:u});else{await navigator.clipboard.writeText(u);share.textContent="入口已复制"}}catch(e){}};
+ b.appendChild(restart);b.appendChild(copy);b.appendChild(share);res.appendChild(b);
+ const note=document.createElement("p");note.className="small";note.textContent="当前为探索性自测，不是经过标准化验证的心理量表，不输出所谓辞职指数或概率。问答仅保存在当前浏览器，未上传服务器。公开分享的是测试入口，不是你的私密结果。";res.appendChild(note);
+ window.scrollTo(0,0);
+}
+el("start").addEventListener("click",start);
+el("next").addEventListener("click",next);
+el("back").addEventListener("click",back);
+if(Object.keys(answers).length)el("start").textContent="继续测试";
+})();
+</script></body></html>
